@@ -17,39 +17,10 @@ from urllib.request import urlretrieve
 #https://br.web.img3.acsta.net/newsv7/22/05/06/20/55/4497665.jpg
 
 def main():
-    cont = 0
-    # Layout da janela
-    layout = [
-        #[sg.Image(filename='teste.jpeg')],
+    menu_def=['&File', ['&Open']],['&Cor',['&Preto e Branco', 'Sepia','Verde', 'Thumbnail' ]]
+    layout=[
+        [sg.Menu(menu_def, pad=(10,10))],
         [sg.Image(key="-IMAGE-", size = (500,500))],
-        [
-            sg.Text("Arquivo de Imagem"),
-            sg.Input(size=(25,1), key = "-FILE-"),
-            sg.FileBrowse(file_types = [("JPEG (*.jpg)", "*.jpg"), ("Todos os arquivos", "*.*")]),
-            sg.Button("Carregar Imagem"),
-        ],
-        [
-            sg.Text("Nome do arquivo"),
-            sg.Input(size=(10,1), key = "-FILENAME-"),
-            sg.Text("Formato"),
-            sg.Combo(["png", "jpeg", "jpg"], key="-COMBO-"),
-            sg.Button("Salvar como Original"),
-            sg.Button("Salvar como Thumbnail"),
-            sg.Button("Salvar com Qualidade Reduzida"),
-
-        ],
-        [
-            sg.Text("Largura"),
-            sg.Input(size=(6,1), key = "-WIDTH-"),
-            sg.Text("Altura"),
-            sg.Input(size=(6,1), key = "-HEIGHT-")
-        ],
-        [
-            sg.Text("Insira um endereço WEB"),
-            sg.Input(size=(25,1), key = "-FILENAMEWEB-"),
-            sg.Button("Salvar imagem WEB"),
-            sg.Button("Mostrar WEB")
-        ]
     ]
 
     # Crio nossa janela
@@ -60,7 +31,27 @@ def main():
         event, value = window.read()
         if event == "Exit" or event == sg.WINDOW_CLOSED:
             break
-        if event == "Carregar Imagem":
+
+        if event == 'Open':
+            filename = sg.popup_get_file('file to open', no_window=True)
+            image = Image.open(filename)
+            bio = io.BytesIO()
+            image.save(bio, format="PNG")
+            sg.popup("Imagem aberta!")
+        window["-IMAGE-"].update(data=bio.getvalue(), size = (500, 500))
+
+        if event == 'Thumbnail':
+            image.thumbnail((75,75))
+            # Salvo ela, e renomeio com o nome que colocamos
+            image.save('teste'+".jpg")
+            bio = io.BytesIO()
+            image.save(bio, format="PNG")
+            sg.popup("Imagem salva!")
+        window["-IMAGE-"].update(data=bio.getvalue(), size = (500, 500))
+
+        
+
+        if event == "Open File":
             arquivo = value['-FILE-']
             if os.path.exists(arquivo):
                 image = Image.open(arquivo)
